@@ -62,7 +62,6 @@ void AChickenRushCharacter::BeginPlay()
 		AChickenBall* ChickenBall = CastChecked<AChickenBall>(actor);
 		Ball = ChickenBall;
 		UKismetSystemLibrary::PrintString(GetWorld(),"BeginPlay Set Ball" );
-
 		break;
 	}
 	
@@ -92,9 +91,6 @@ void AChickenRushCharacter::SetupPlayerInputComponent(class UInputComponent* Pla
 	// handle touch devices
 	PlayerInputComponent->BindTouch(IE_Pressed, this, &AChickenRushCharacter::TouchStarted);
 	PlayerInputComponent->BindTouch(IE_Released, this, &AChickenRushCharacter::TouchStopped);
-
-	// VR headset functionality
-	PlayerInputComponent->BindAction("ResetVR", IE_Pressed, this, &AChickenRushCharacter::OnResetVR);
 
 	PlayerInputComponent->BindAction("Pick", IE_Pressed, this, &AChickenRushCharacter::OnPick);
 	PlayerInputComponent->BindAction("Throw", IE_Pressed, this, &AChickenRushCharacter::OnThrow);
@@ -126,8 +122,13 @@ void AChickenRushCharacter::PickUpBall()
 	Ball->GetStaticMeshComponent()->SetSimulatePhysics(false);
 	Ball->GetStaticMeshComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	Ball->GetStaticMeshComponent()->SetEnableGravity(false);
-	Ball->SetReplicates(false);
-	Ball->SetReplicateMovement(false);
+
+	// 禁用ProjectileMovementComponent
+	if (Ball->ProjectileMovementComponent)
+	{
+		Ball->ProjectileMovementComponent->Deactivate();
+	}
+	
 	FAttachmentTransformRules Rules( EAttachmentRule::SnapToTarget , false );
 	Ball->AttachToComponent( GetMesh() , Rules , "headSocket");
 	bHoldingBall = true;
@@ -138,18 +139,13 @@ void AChickenRushCharacter::PickUpBall()
 
 void AChickenRushCharacter::ThrowBall()
 {
-	Ball->GetStaticMeshComponent()->SetSimulatePhysics(true);
-	Ball->GetStaticMeshComponent()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
-	Ball->GetStaticMeshComponent()->SetEnableGravity(true);
-	Ball->SetReplicates(true);
-	Ball->SetReplicateMovement(true);
-	FDetachmentTransformRules Rules( EDetachmentRule::KeepWorld , true );
-	Ball->DetachFromActor( Rules );
+	UKismetSystemLibrary::PrintString(GetWorld(),"Character Throw Ball" );
 	bHoldingBall = false;
-	Ball->bHolded = false;
-	FVector Pulse = GetMesh()->GetRightVector() * 1500.0f;
-	Ball->GetStaticMeshComponent()->AddImpulse( Pulse , NAME_None , true );
-	UKismetSystemLibrary::PrintString(GetWorld(),"Throw Ball" );
+	
+	// TODO 对小球的调用改成事件
+	FVector LaunchDir = GetMesh()->GetRightVector();
+	FVector HorizontalDir( LaunchDir.X , LaunchDir.Y , 0 );
+	Ball->ThrowBall(HorizontalDir);
 }
 
 void AChickenRushCharacter::ServerThrowBall_Implementation()
@@ -216,25 +212,14 @@ void AChickenRushCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>
 	// DOREPLIFETIME( AChickenRushCharacter , bHoldingBall );
 }
 
-void AChickenRushCharacter::OnResetVR()
-{
-	// If ChickenRush is added to a project via 'Add Feature' in the Unreal Editor the dependency on HeadMountedDisplay in ChickenRush.Build.cs is not automatically propagated
-	// and a linker error will result.
-	// You will need to either:
-	//		Add "HeadMountedDisplay" to [YourProject].Build.cs PublicDependencyModuleNames in order to build successfully (appropriate if supporting VR).
-	// or:
-	//		Comment or delete the call to ResetOrientationAndPosition below (appropriate if not supporting VR)
-	UHeadMountedDisplayFunctionLibrary::ResetOrientationAndPosition();
-}
-
 void AChickenRushCharacter::TouchStarted(ETouchIndex::Type FingerIndex, FVector Location)
 {
-		Jump();
+	Jump();
 }
 
 void AChickenRushCharacter::TouchStopped(ETouchIndex::Type FingerIndex, FVector Location)
 {
-		StopJumping();
+	StopJumping();
 }
 
 void AChickenRushCharacter::TurnAtRate(float Rate)

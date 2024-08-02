@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Engine/StaticMeshActor.h"
+#include "GameFramework/ProjectileMovementComponent.h"
 #include "ChickenBall.generated.h"
 
 UCLASS()
@@ -18,7 +19,10 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="My Variables"  )
 	bool bHolded;
 
-	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Movement")
+	UProjectileMovementComponent* ProjectileMovementComponent;
+
+
 	
 protected:
 	// Called when the game starts or when spawned
@@ -27,4 +31,20 @@ protected:
 public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
+	
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+
+	UFUNCTION()
+	void ThrowBall(const FVector& Direction);
+
+	// UFUNCTION(Server,Reliable)
+	// void ServerThrowBall(const FVector& Direction);
+	//
+	// UFUNCTION(NetMulticast, Reliable)
+	// void MulticastThrowBall(const FVector& Direction);
+
+	UFUNCTION()
+	void OnBallHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
+
+	
 };
