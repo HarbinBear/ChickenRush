@@ -1,0 +1,78 @@
+# Visual Studio 2015201720192022
+.vscode
+.vscode
+.idea
+.idea
+
+# Build directories
+Binaries
+Build
+DerivedDataCache
+Intermediate
+Saved
+
+# Compiled source files
+.dll
+.exe
+.compiled
+.ilk
+.meta
+.obj
+.pdb
+.ipch
+.log
+.dat
+.pak
+.unity3d
+.tmproj
+.log
+
+# Ignore directories
+DerivedDataCache
+Intermediate
+Build
+Saved
+Binaries
+Documentation
+
+# Ignore project files and configuration files
+.VC.db
+.VC.opendb
+.VC.VC.db
+.suo
+.user
+.userosscache
+.userprefs
+
+# Compiled data
+.so
+.dylib
+.lib
+
+# Crash logs
+.dmp
+
+# Cache files for macOS and Windows
+.DS_Store
+Thumbs.db
+
+# Ignore Unreal Engine derived files and folders
+.aps
+.aps.csproj
+.xcodeproj
+.xcworkspace
+.xcworkspacedata
+.xcscheme
+.xcodeproj
+.xcworkspace
+.xcscheme
+.xcodeproj
+.xcworkspace
+.xcscheme
+
+# Ignore build output directories
+# This helps ensure that built files are not accidentally committed into source control.
+EngineBuildBatchFilesBuildBinaries
+EngineBuildBatchFilesBuildIntermediate
+EngineBuildBatchFilesBuildSaved
+EngineBuildBatchFilesBuildBuild
