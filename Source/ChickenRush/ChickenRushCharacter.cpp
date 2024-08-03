@@ -119,20 +119,11 @@ void AChickenRushCharacter::OnThrow()
 
 void AChickenRushCharacter::PickUpBall()
 {
-	Ball->GetStaticMeshComponent()->SetSimulatePhysics(false);
-	Ball->GetStaticMeshComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-	Ball->GetStaticMeshComponent()->SetEnableGravity(false);
-
-	// 禁用ProjectileMovementComponent
-	if (Ball->ProjectileMovementComponent)
-	{
-		Ball->ProjectileMovementComponent->Deactivate();
-	}
-	
+	// TODO 球球需要知道持球者
+	Ball->PickUpBall();
 	FAttachmentTransformRules Rules( EAttachmentRule::SnapToTarget , false );
 	Ball->AttachToComponent( GetMesh() , Rules , "headSocket");
 	bHoldingBall = true;
-	Ball->bHolded = true;
 	UKismetSystemLibrary::PrintString(GetWorld(),"Pick Up Ball" );
 	
 }

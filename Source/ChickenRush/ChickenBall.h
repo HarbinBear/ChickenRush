@@ -13,7 +13,6 @@ class CHICKENRUSH_API AChickenBall : public AStaticMeshActor
 	GENERATED_BODY()
 
 public:
-	// Sets default values for this actor's properties
 	AChickenBall();
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="My Variables"  )
@@ -35,6 +34,9 @@ public:
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 	UFUNCTION()
+	void PickUpBall();
+	
+	UFUNCTION()
 	void ThrowBall(const FVector& Direction);
 
 	// UFUNCTION(Server,Reliable)
@@ -44,7 +46,9 @@ public:
 	// void MulticastThrowBall(const FVector& Direction);
 
 	UFUNCTION()
-	void OnBallHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
+	void OnBallBounce(const FHitResult& ImpactResult, const FVector& ImpactVelocity);
 
+	UFUNCTION()
+	void OnBallHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
 	
 };
