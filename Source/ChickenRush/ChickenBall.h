@@ -15,8 +15,11 @@ class CHICKENRUSH_API AChickenBall : public AStaticMeshActor
 public:
 	AChickenBall();
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="My Variables"  )
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Chicken"  )
 	bool bHolded;
+
+	UPROPERTY(EditAnywhere , BlueprintReadWrite , Category = "Chicken")
+	class AChickenRushCharacter* Character;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Movement")
 	UProjectileMovementComponent* ProjectileMovementComponent;
@@ -36,10 +39,10 @@ public:
 	virtual void PostInitializeComponents() override;
 
 	UFUNCTION()
-	void PickUpBall();
+	void PickUpBall(AChickenRushCharacter* InCharacter);
 	
 	UFUNCTION()
-	void ThrowBall(const FVector& Direction);
+	void ThrowBall(const FVector& Direction );
 
 	// UFUNCTION(Server,Reliable)
 	// void ServerThrowBall(const FVector& Direction);

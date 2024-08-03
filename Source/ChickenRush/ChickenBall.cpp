@@ -4,6 +4,7 @@
 #include "ChickenBall.h"
 
 #include "ChickenRushCharacter.h"
+#include "Components/ArrowComponent.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "Net/UnrealNetwork.h"
 
@@ -49,10 +50,9 @@ void AChickenBall::PostInitializeComponents()
 	Super::PostInitializeComponents();
 }
 
-void AChickenBall::PickUpBall()
+void AChickenBall::PickUpBall(AChickenRushCharacter* InCharacter)
 {
-	// SetReplicates(false);
-	// SetReplicateMovement(false);
+	Character = InCharacter;
 	
 	GetStaticMeshComponent()->SetSimulatePhysics(false);
 	GetStaticMeshComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
@@ -63,10 +63,21 @@ void AChickenBall::PickUpBall()
 	{
 		ProjectileMovementComponent->Deactivate();
 	}
+
+	// 挂在 Mesh的Socket下
+	FAttachmentTransformRules Rules( EAttachmentRule::SnapToTarget , false );
+	AttachToComponent( InCharacter->GetMesh() , Rules , "headSocket");
+
+	// 挂在 SceneComponent下
+	// FAttachmentTransformRules Rules(EAttachmentRule::SnapToTarget, false);
+	// AttachToComponent( Character->SceneSocketComponent, Rules);
+	
 	bHolded = true;
+
+	UKismetSystemLibrary::PrintString(GetWorld(),TEXT("Ball PickUp Ball ") );
 }
 
-void AChickenBall::ThrowBall(const FVector& Direction)
+void AChickenBall::ThrowBall(const FVector& Direction )
 {
 
 	GetStaticMeshComponent()->SetSimulatePhysics(false);
@@ -79,15 +90,13 @@ void AChickenBall::ThrowBall(const FVector& Direction)
 	ProjectileMovementComponent->bRotationFollowsVelocity = true;
 	ProjectileMovementComponent->bShouldBounce = true;
 	ProjectileMovementComponent->Velocity = Direction * 1500.0f ; 
-	
-	ProjectileMovementComponent->Activate();
 
 	FDetachmentTransformRules Rules( EDetachmentRule::KeepWorld , true );
 	DetachFromActor( Rules );
-	bHolded = false;
 	
-	// SetReplicates(true);
-	// SetReplicateMovement(true);
+	ProjectileMovementComponent->Activate();
+
+	bHolded = false;
 	
 	UKismetSystemLibrary::PrintString(GetWorld(),TEXT("Ball Throw Ball ") );
 }
@@ -97,12 +106,15 @@ void AChickenBall::OnBallBounce(const FHitResult& ImpactResult, const FVector& I
 	UKismetSystemLibrary::PrintString(GetWorld(),TEXT("On Ball Bounce: ") + ImpactResult.Actor->GetName() );
 	AChickenRushCharacter* crc = Cast<AChickenRushCharacter>(ImpactResult.Actor);
 	// TODO 除了射球时的持球者外，其余物体都应该有碰撞
-	if( crc == nullptr )
+	if( crc == NULL || // 不是人
+		! ( crc->IsValidLowLevel() && Character->IsValidLowLevel() && crc == Character ) ) // 是人非几
 	{
+		UKismetSystemLibrary::PrintString(GetWorld(),TEXT("On Ball Bounce: 除了射球时的持球者外，其余物体都应该有碰撞") );
 		GetStaticMeshComponent()->SetSimulatePhysics(true);
 		GetStaticMeshComponent()->SetEnableGravity(true);
 		// ProjectileMovementComponent->Deactivate();
 	}
+	Character = NULL;
 }
 
 // void AChickenBall::OnBallHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp,
@@ -110,7 +122,6 @@ void AChickenBall::OnBallBounce(const FHitResult& ImpactResult, const FVector& I
 // {
 // 	UKismetSystemLibrary::PrintString(GetWorld(),TEXT("On Ball Hit: ") + OtherActor->GetName() );
 // 	AChickenRushCharacter* crc = Cast<AChickenRushCharacter>(OtherActor);
-// 	// TODO 除了射球时的持球者外，其余物体都应该有碰撞
 // 	if( crc == nullptr )
 // 	{
 // 		GetStaticMeshComponent()->SetSimulatePhysics(true);

@@ -48,9 +48,11 @@ AChickenRushCharacter::AChickenRushCharacter():
 	FollowCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName); // Attach the camera to the end of the boom and let the boom adjust to match the controller orientation
 	FollowCamera->bUsePawnControlRotation = false; // Camera does not rotate relative to arm
 
-	// ArrowSocket->CreateDefaultSubobject<UArrowComponent>(TEXT("ArrowSocket"));
-	// ArrowSocket->SetupAttachment( RootComponent );
-	// ArrowSocket->SetRelativeLocation( FVector(120,0,0));
+	// Socket Component for Chicken Ball
+	SceneSocketComponent = CreateDefaultSubobject<USceneComponent>(TEXT("SceneSocketComponent"));
+	SceneSocketComponent->SetupAttachment(RootComponent);
+	SceneSocketComponent->SetRelativeLocation(FVector(100.0f, 0.0f, 50.0f)); // 例如设置在前方100单位，Z轴50单位处
+	SceneSocketComponent->SetRelativeRotation(FRotator(0.0f, 0.0f, 0.0f));
 
 	// Note: The skeletal mesh and anim blueprint references on the Mesh component (inherited from Character) 
 	// are set in the derived blueprint asset named MyCharacter (to avoid direct content references in C++)
@@ -61,7 +63,7 @@ void AChickenRushCharacter::BeginPlay()
 	Super::BeginPlay();
 	TArray<AActor*> AllActors;
 	UGameplayStatics::GetAllActorsOfClass( GetWorld() , AChickenBall::StaticClass() , AllActors );
-	// 先假设小球始终唯一。
+	// 先假设小球始终唯一。 TODO 建立小球管理系统
 	for( AActor* actor : AllActors )
 	{
 		AChickenBall* ChickenBall = CastChecked<AChickenBall>(actor);
@@ -124,10 +126,8 @@ void AChickenRushCharacter::OnThrow()
 
 void AChickenRushCharacter::PickUpBall()
 {
-	// TODO 球球需要知道持球者
-	Ball->PickUpBall();
-	FAttachmentTransformRules Rules( EAttachmentRule::SnapToTarget , false );
-	Ball->AttachToComponent( GetMesh() , Rules , "headSocket");
+	Ball->PickUpBall( this );
+
 	bHoldingBall = true;
 	UKismetSystemLibrary::PrintString(GetWorld(),"Pick Up Ball" );
 	
@@ -141,7 +141,7 @@ void AChickenRushCharacter::ThrowBall()
 	// TODO 对小球的调用改成事件
 	FVector LaunchDir = GetMesh()->GetRightVector();
 	FVector HorizontalDir( LaunchDir.X , LaunchDir.Y , 0 );
-	Ball->ThrowBall(HorizontalDir);
+	Ball->ThrowBall( HorizontalDir );
 }
 
 void AChickenRushCharacter::ServerThrowBall_Implementation()
