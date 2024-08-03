@@ -24,7 +24,9 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Movement")
 	UProjectileMovementComponent* ProjectileMovementComponent;
 
+	UMaterialInterface* RollingMat;
 
+	UMaterialInterface* FlyingMat;
 	
 protected:
 	// Called when the game starts or when spawned

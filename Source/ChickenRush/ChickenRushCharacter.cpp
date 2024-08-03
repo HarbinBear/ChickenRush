@@ -221,13 +221,13 @@ void AChickenRushCharacter::TouchStopped(ETouchIndex::Type FingerIndex, FVector 
 void AChickenRushCharacter::TurnAtRate(float Rate)
 {
 	// calculate delta for this frame from the rate information
-	AddControllerYawInput(Rate * BaseTurnRate * GetWorld()->GetDeltaSeconds());
+	// AddControllerYawInput(Rate * BaseTurnRate * GetWorld()->GetDeltaSeconds());
 }
 
 void AChickenRushCharacter::LookUpAtRate(float Rate)
 {
 	// calculate delta for this frame from the rate information
-	AddControllerPitchInput(Rate * BaseLookUpRate * GetWorld()->GetDeltaSeconds());
+	// AddControllerPitchInput(Rate * BaseLookUpRate * GetWorld()->GetDeltaSeconds());
 }
 
 void AChickenRushCharacter::MoveForward(float Value)
@@ -239,7 +239,10 @@ void AChickenRushCharacter::MoveForward(float Value)
 		const FRotator YawRotation(0, Rotation.Yaw, 0);
 
 		// get forward vector
-		const FVector Direction = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
+		FVector Direction = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
+
+		Direction = FVector(1,0,0);
+		
 		AddMovementInput(Direction, Value);
 	}
 }
@@ -253,7 +256,10 @@ void AChickenRushCharacter::MoveRight(float Value)
 		const FRotator YawRotation(0, Rotation.Yaw, 0);
 	
 		// get right vector 
-		const FVector Direction = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
+		FVector Direction = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
+
+		Direction = FVector(0,1,0);
+		
 		// add movement in that direction
 		AddMovementInput(Direction, Value);
 	}

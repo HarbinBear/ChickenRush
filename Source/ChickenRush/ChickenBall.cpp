@@ -21,6 +21,33 @@ AChickenBall::AChickenBall():
 	ProjectileMovementComponent = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("ProjectileMovementComponent"));
 	ProjectileMovementComponent->UpdatedComponent = GetStaticMeshComponent();
 	ProjectileMovementComponent->OnProjectileBounce.AddDynamic(this, &AChickenBall::OnBallBounce);
+
+	ConstructorHelpers::FObjectFinder<UMaterialInterface> RollingMatFinder(TEXT("Material'/Game/StarterContent/Materials/M_Metal_Steel.M_Metal_Steel'"));
+	if (RollingMatFinder.Succeeded())
+	{
+		RollingMat = RollingMatFinder.Object;
+		UKismetSystemLibrary::PrintString(GetWorld(),TEXT("RollingMatFinder.Succeeded") );
+	}
+	else
+	{
+		RollingMat = NULL; // 查找失败时设为 null
+		UKismetSystemLibrary::PrintString(GetWorld(),TEXT("RollingMatFinder.Failed") );
+	}
+
+	ConstructorHelpers::FObjectFinder<UMaterialInterface> FlyingMatFinder(TEXT("Material'/Game/StarterContent/Materials/M_Metal_Gold.M_Metal_Gold'"));
+	if (FlyingMatFinder.Succeeded())
+	{
+		FlyingMat = FlyingMatFinder.Object;
+		UKismetSystemLibrary::PrintString(GetWorld(),TEXT("FlyingMatFinder.Succeeded") );
+	}
+	else
+	{
+		FlyingMat = NULL; // 查找失败时设为 null
+		UKismetSystemLibrary::PrintString(GetWorld(),TEXT("FlyingMatFinder.Failed") );
+	}
+
+	if(RollingMat) GetStaticMeshComponent()->SetMaterial( 0 , RollingMat );
+	
 }
 
 
@@ -83,6 +110,7 @@ void AChickenBall::ThrowBall(const FVector& Direction )
 	GetStaticMeshComponent()->SetSimulatePhysics(false);
 	GetStaticMeshComponent()->SetEnableGravity(false);
 	GetStaticMeshComponent()->SetCollisionEnabled( ECollisionEnabled::QueryAndPhysics );
+	if(FlyingMat) GetStaticMeshComponent()->SetMaterial( 0 , FlyingMat );
 
 	ProjectileMovementComponent->ProjectileGravityScale = 0.0f;
 	ProjectileMovementComponent->InitialSpeed = 1500.0f;
@@ -113,6 +141,7 @@ void AChickenBall::OnBallBounce(const FHitResult& ImpactResult, const FVector& I
 		GetStaticMeshComponent()->SetSimulatePhysics(true);
 		GetStaticMeshComponent()->SetEnableGravity(true);
 		// ProjectileMovementComponent->Deactivate();
+		if(RollingMat) GetStaticMeshComponent()->SetMaterial( 0 , RollingMat );
 	}
 	Character = NULL;
 }
