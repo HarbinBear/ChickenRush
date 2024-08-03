@@ -50,7 +50,7 @@ public:
 	UFUNCTION()
 	void OnBallBounce(const FHitResult& ImpactResult, const FVector& ImpactVelocity);
 
-	UFUNCTION()
-	void OnBallHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
+	// UFUNCTION()
+	// void OnBallHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
 	
 };
