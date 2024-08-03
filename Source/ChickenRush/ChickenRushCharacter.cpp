@@ -139,9 +139,7 @@ void AChickenRushCharacter::ThrowBall()
 	bHoldingBall = false;
 	
 	// TODO 对小球的调用改成事件
-	FVector LaunchDir = GetMesh()->GetRightVector();
-	FVector HorizontalDir( LaunchDir.X , LaunchDir.Y , 0 );
-	Ball->ThrowBall( HorizontalDir );
+	Ball->ThrowBall();
 }
 
 void AChickenRushCharacter::ServerThrowBall_Implementation()

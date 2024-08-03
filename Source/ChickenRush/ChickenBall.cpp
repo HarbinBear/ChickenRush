@@ -4,6 +4,7 @@
 #include "ChickenBall.h"
 
 #include "ChickenRushCharacter.h"
+#include "DrawDebugHelpers.h"
 #include "Components/ArrowComponent.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "Net/UnrealNetwork.h"
@@ -63,6 +64,7 @@ void AChickenBall::BeginPlay()
 void AChickenBall::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+	DrawPreviewTrajectory();
 }
 
 
@@ -104,7 +106,7 @@ void AChickenBall::PickUpBall(AChickenRushCharacter* InCharacter)
 	UKismetSystemLibrary::PrintString(GetWorld(),TEXT("Ball PickUp Ball ") );
 }
 
-void AChickenBall::ThrowBall(const FVector& Direction )
+void AChickenBall::ThrowBall()
 {
 
 	GetStaticMeshComponent()->SetSimulatePhysics(false);
@@ -112,13 +114,18 @@ void AChickenBall::ThrowBall(const FVector& Direction )
 	GetStaticMeshComponent()->SetCollisionEnabled( ECollisionEnabled::QueryAndPhysics );
 	if(FlyingMat) GetStaticMeshComponent()->SetMaterial( 0 , FlyingMat );
 
+	FVector LaunchDir = Character->GetMesh()->GetRightVector();
+	FVector HorizontalDir( LaunchDir.X , LaunchDir.Y , 0 );
+	
 	ProjectileMovementComponent->ProjectileGravityScale = 0.0f;
 	ProjectileMovementComponent->InitialSpeed = 1500.0f;
 	ProjectileMovementComponent->MaxSpeed = 1500.0f;
 	ProjectileMovementComponent->bRotationFollowsVelocity = true;
 	ProjectileMovementComponent->bShouldBounce = true;
-	ProjectileMovementComponent->Velocity = Direction * 1500.0f ; 
+	ProjectileMovementComponent->Velocity = HorizontalDir * 1500.0f ; 
 
+	SetActorLocation( Character->SceneSocketComponent->GetComponentLocation() );
+	
 	FDetachmentTransformRules Rules( EDetachmentRule::KeepWorld , true );
 	DetachFromActor( Rules );
 	
@@ -159,5 +166,17 @@ void AChickenBall::OnBallBounce(const FHitResult& ImpactResult, const FVector& I
 // 	}
 // }
 
+// 绘制预览轨迹函数
+void AChickenBall::DrawPreviewTrajectory(  )
+{
+	if ( Character && bHolded )
+	{
+		FVector StartLocation = Character->SceneSocketComponent->GetComponentLocation();
+		FVector LaunchDir = Character->GetMesh()->GetRightVector();
+		FVector HorizontalDir( LaunchDir.X , LaunchDir.Y , 0 );
+		FVector EndLocation = StartLocation + (HorizontalDir * 15000.0f); // 预设的扔球速度
 
+		DrawDebugLine(GetWorld(), StartLocation, EndLocation, FColor::Green, false, 0.1f, 0, 3.0f);
+	}
+}
 

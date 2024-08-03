@@ -44,7 +44,7 @@ public:
 	void PickUpBall(AChickenRushCharacter* InCharacter);
 	
 	UFUNCTION()
-	void ThrowBall(const FVector& Direction );
+	void ThrowBall();
 
 	// UFUNCTION(Server,Reliable)
 	// void ServerThrowBall(const FVector& Direction);
@@ -54,6 +54,7 @@ public:
 
 	UFUNCTION()
 	void OnBallBounce(const FHitResult& ImpactResult, const FVector& ImpactVelocity);
+	void DrawPreviewTrajectory();
 
 	// UFUNCTION()
 	// void OnBallHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
