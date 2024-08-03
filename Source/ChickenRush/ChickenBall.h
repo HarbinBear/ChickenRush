@@ -24,8 +24,10 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Movement")
 	UProjectileMovementComponent* ProjectileMovementComponent;
 
+	UPROPERTY(EditAnywhere , BlueprintReadWrite , Category = "Chicken")
 	UMaterialInterface* RollingMat;
 
+	UPROPERTY(EditAnywhere , BlueprintReadWrite , Category = "Chicken")
 	UMaterialInterface* FlyingMat;
 	
 protected:
